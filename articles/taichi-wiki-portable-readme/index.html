@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌿 Taichi Wiki — Portable Bundle - Taichi Health & Finance Intranet</title>
+    <link rel="stylesheet" href="../../assets/css/site.css">
+</head>
+<body class="">
+    <div id="reading-progress"></div>
+    <header class="masthead">
+        <div style="margin-bottom: 8px;"><a href="http://localhost:8767/index.html" class="badge" style="background:#047857;color:white;text-decoration:none;" target="_blank">🌐 Browse on Local Intranet (Port 8767)</a></div>
+        <h1>🌿 Taichi Wiki — Portable Bundle</h1>
+        <p>Taichi Health &amp; Finance Intranet &middot; Tai Chi, Qigong, Health, Daoist Arts &amp; Life Philosophy</p>
+    </header>
+
+    <nav class="topnav">
+        <div class="nav-links">
+            <a href="/index.html">🏠 Home</a><a href="/thai-cuc-quyen/">🇻🇳 Thái Cực Quyền</a><a href="/tai-chi/">🇬🇧 Tai Chi (English)</a><a href="/podcast/">🎙️ Taichi Podcast</a><a href="/articles/" class="active">📚 All Articles</a><a href="/daoist/">☯️ Daoist Arts</a><a href="/books/">📖 Books Library</a><a href="/videos/">🎥 Videos</a><a href="/deep-dives/">🌊 Deep Dives</a><a href="/practice-vault/">🧘 Practice Vault</a><a href="/life-skills/">🌿 Life Skills</a><a href="/research/">🔬 Research</a><a href="/gemini-notebooks/">🤖 Gemini Notebooks</a>
+        </div>
+        <div class="nav-actions">
+            <button id="theme-toggle-btn" class="theme-toggle" type="button" aria-label="Toggle theme">🌙 Dark</button>
+        </div>
+    </nav>
+
+    <main>
+        
+        <div class="article-container">
+            <article class="article-body">
+                <header class="article-header">
+                    <h1>🌿 Taichi Wiki — Portable Bundle</h1>
+                    
+        <div class="article-meta-bar">
+          <span class="badge">🇬🇧 English</span>
+          <span class="badge" style="background:var(--accent-light);color:var(--accent-dark);">Taichi Wiki</span>
+          <span>⏱️ 2 min read (422 words)</span>
+          <span>📦 2.9 KB</span>
+          <span>📅 Jun 24, 2026</span>
+        </div>
+                </header>
+                <div class="md-content">
+                    <h1 id="taichi-wiki-portable-bundle">🌿 Taichi Wiki — Portable Bundle <a href="#taichi-wiki-portable-bundle" class="anchor-link" title="Direct link">#</a></h1>
+<p>This bundle contains <strong>two ready-to-push MkDocs wiki sites</strong>:</p>
+<div class="table-wrap"><table class="md-table"><thead><tr>
+<th>Folder</th>
+<th>GitHub repo</th>
+<th>Live URL (after push)</th>
+</tr></thead><tbody>
+<tr>
+<td><code>taichi-wiki/</code></td>
+<td><code>HenryPhamDuc/taichi-wiki</code></td>
+<td><a href="https://henryPhamDuc.github.io/taichi-wiki/" target="_blank" rel="noopener">https://henryPhamDuc.github.io/taichi-wiki/</a></td>
+</tr>
+<tr>
+<td><code>taichi-wiki-en/</code></td>
+<td><code>HenryPhamDuc/taichi-wiki-en</code></td>
+<td><a href="https://henryPhamDuc.github.io/taichi-wiki-en/" target="_blank" rel="noopener">https://henryPhamDuc.github.io/taichi-wiki-en/</a></td>
+</tr>
+</tbody></table></div>
+<p>Both contain:</p>
+<ul>
+<li><strong>148 articles</strong> each (VI and EN) across 8 sections</li>
+<li>Material for MkDocs static site</li>
+<li>D3.js v7 interactive knowledge graph</li>
+<li>GitHub Actions auto-deploy workflow</li>
+<li>Cross-links to Henry's Taichi Practice Vault and the Tennis Wiki ecosystem</li>
+</ul>
+<h2 id="how-to-push-from-a-different-machine">How to push from a different machine <a href="#how-to-push-from-a-different-machine" class="anchor-link" title="Direct link">#</a></h2>
+<h3 id="option-1-powershell-windows">Option 1: PowerShell (Windows) <a href="#option-1-powershell-windows" class="anchor-link" title="Direct link">#</a></h3>
+
+<div class="code-block-wrap">
+  <div class="code-block-header">
+    <span>powershell</span>
+    <button type="button" class="copy-btn">Copy</button>
+  </div>
+  <pre><code class="language-powershell"># In the VI repo
+cd C:\path\to\taichi-wiki
+.\push-to-github.ps1
+# When prompted, paste your GitHub token (ghp_...)
+
+# In the EN repo
+cd C:\path\to\taichi-wiki-en
+.\push-to-github.ps1</code></pre>
+</div>
+<h3 id="option-2-git-bash-wsl-linux-mac">Option 2: git-bash / WSL / Linux / Mac <a href="#option-2-git-bash-wsl-linux-mac" class="anchor-link" title="Direct link">#</a></h3>
+
+<div class="code-block-wrap">
+  <div class="code-block-header">
+    <span>bash</span>
+    <button type="button" class="copy-btn">Copy</button>
+  </div>
+  <pre><code class="language-bash">cd /path/to/taichi-wiki
+bash push-to-github.sh
+# When prompted, paste your GitHub token (ghp_...)</code></pre>
+</div>
+<h2 id="whats-needed">What's needed <a href="#whats-needed" class="anchor-link" title="Direct link">#</a></h2>
+<ol>
+<li><strong>Git</strong> (any version 2.x+)</li>
+<li><strong>GitHub Personal Access Token</strong> with scopes <code>repo</code> + <code>workflow</code>:</li>
+</ol>
+<ul>
+<li>Generate at <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">https://github.com/settings/tokens/new</a></li>
+<li>Note: anything (e.g. <code>taichi-wiki-deploy</code>)</li>
+<li>Expiration: 90 days or No expiration</li>
+<li>Scopes: ✅ <code>repo</code>, ✅ <code>workflow</code></li>
+</ul>
+<ol>
+<li><strong>Python 3</strong> only needed if you want to rebuild locally (not required for pushing)</li>
+</ol>
+<h2 id="what-the-script-does">What the script does <a href="#what-the-script-does" class="anchor-link" title="Direct link">#</a></h2>
+<ol>
+<li>Creates the GitHub repo (idempotent — won't fail if it exists)</li>
+<li>Enables GitHub Pages with source = GitHub Actions</li>
+<li>Pushes to <code>main</code></li>
+<li>Waits ~30s, then polls Actions for the first deploy</li>
+<li>Prints the live URL when deploy succeeds (~2-3 min total)</li>
+</ol>
+<h2 id="local-preview-optional">Local preview (optional) <a href="#local-preview-optional" class="anchor-link" title="Direct link">#</a></h2>
+<p>If you want to see the site before pushing:</p>
+
+<div class="code-block-wrap">
+  <div class="code-block-header">
+    <span>bash</span>
+    <button type="button" class="copy-btn">Copy</button>
+  </div>
+  <pre><code class="language-bash"># Requires: pip install mkdocs mkdocs-material pymdown-extensions pygments
+cd taichi-wiki
+mkdocs serve
+# Open http://127.0.0.1:8000</code></pre>
+</div>
+<h2 id="file-structure">File structure <a href="#file-structure" class="anchor-link" title="Direct link">#</a></h2>
+
+<div class="code-block-wrap">
+  <div class="code-block-header">
+    <span>text</span>
+    <button type="button" class="copy-btn">Copy</button>
+  </div>
+  <pre><code class="language-text">taichi-wiki-portable/
+├── taichi-wiki/          # Vietnamese site (148 articles)
+│   ├── .github/workflows/deploy.yml
+│   ├── docs/             # All article markdown + assets
+│   ├── mkdocs.yml        # Material theme config + nav
+│   ├── push-to-github.sh
+│   ├── push-to-github.ps1
+│   ├── README.md
+│   └── .gitignore
+└── taichi-wiki-en/       # English site (148 articles)
+    └── (same structure)</code></pre>
+</div>
+<h2 id="if-push-fails">If push fails <a href="#if-push-fails" class="anchor-link" title="Direct link">#</a></h2>
+<ul>
+<li><strong>HTTP 401 on repo create</strong>: Token is invalid. Regenerate at <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">https://github.com/settings/tokens/new</a></li>
+<li><strong>Build fails</strong>: Check Actions log at <a href="https://github.com/HenryPhamDuc/taichi-wiki/actions" target="_blank" rel="noopener">https://github.com/HenryPhamDuc/taichi-wiki/actions</a> or taichi-wiki-en/actions</li>
+<li><strong>"Token too short"</strong>: The Read-Host prompt may have eaten your paste. Try generating a new token, copying the FULL <code>ghp_...</code> string, and pasting again.</li>
+<li><strong>"remote origin already exists"</strong>: Run <code>git remote remove origin</code> then re-run the script</li>
+</ul>
+                </div>
+            </article>
+            
+<aside class="toc-sidebar">
+  <h4>Table of Contents</h4>
+  <ul>
+    <li class="toc-level-1"><a href="#taichi-wiki-portable-bundle">🌿 Taichi Wiki — Portable Bundle</a></li><li class="toc-level-2"><a href="#how-to-push-from-a-different-machine">How to push from a different machine</a></li><li class="toc-level-3"><a href="#option-1-powershell-windows">Option 1: PowerShell (Windows)</a></li><li class="toc-level-3"><a href="#option-2-git-bash-wsl-linux-mac">Option 2: git-bash / WSL / Linux / Mac</a></li><li class="toc-level-2"><a href="#whats-needed">What&#x27;s needed</a></li><li class="toc-level-2"><a href="#what-the-script-does">What the script does</a></li><li class="toc-level-2"><a href="#local-preview-optional">Local preview (optional)</a></li><li class="toc-level-2"><a href="#file-structure">File structure</a></li><li class="toc-level-2"><a href="#if-push-fails">If push fails</a></li>
+  </ul>
+</aside>
+        </div>
+    </main>
+
+    <button id="back-to-top" class="back-to-top" title="Back to top">↑</button>
+
+    <footer>
+        &copy; 2026 Henry Phạm Đức &middot; Taichi Health &amp; Finance Research Portal &middot; Served locally at <a href="http://localhost:8767/index.html">http://localhost:8767</a>
+    </footer>
+
+    <script src="../../assets/js/site.js"></script>
+</body>
+</html>
