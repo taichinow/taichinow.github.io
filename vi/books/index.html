@@ -154,6 +154,31 @@
   transition: transform .18s, box-shadow .18s;
 }
 .tj-chip:hover { transform: translateY(-2px); box-shadow: 0 6px 14px -6px rgba(180,83,9,.5); }
+.tjb-groups { display: flex; flex-direction: column; gap: 16px; }
+.tjb-group-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed #fcd34d;
+}
+.tjb-group-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #78350f;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.tjb-group-count {
+  background: #fde68a;
+  color: #78350f;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 9px;
+  border-radius: 10px;
+  letter-spacing: 0;
+}
 .title-byline {
   display: block;
   font-size: 0.82rem;
@@ -211,11 +236,18 @@
 
 <div class="translated-jump-banner">
   <div class="tjb-head">
-    <span class="tjb-pill">✅ Đã Dịch Hoàn Chỉnh — 44 Tác Phẩm Song Ngữ</span>
-    <span class="tjb-note">Nhảy nhanh đến bản dịch toàn văn</span>
+    <span class="tjb-pill">✅ Đã Dịch Hoàn Chỉnh — 45 Tác Phẩm Song Ngữ</span>
+    <span class="tjb-note">Nhảy nhanh đến bản dịch toàn văn · Xếp theo tủ sách</span>
   </div>
-  <div class="tjb-chips">
+  <div class="tjb-groups">
+    <div class="tjb-group">
+      <div class="tjb-group-head">
+        <span class="tjb-group-label">⭐ Tuyển Chọn Nổi Bật</span>
+        <span class="tjb-group-count">18</span>
+      </div>
+      <div class="tjb-chips">
         <a class="tj-chip" href="/vi/books/thai_cuc_quyen_doi_luyen_vi.html">Thái Cực Quyền Đối Luyện (Tập 6)</a>
+        <a class="tj-chip" href="/vi/books/jerry_alan_johnson_chinese_medical_qigong_vol1_vi.html">Khí Công Y Học: Giải Phẫu &amp; Sinh Lý Năng Lượng (Tập 1)</a>
         <a class="tj-chip" href="/vi/books/chen_taichi_instructions_chen_village_vol1_vi.html">Chỉ Dẫn Truyền Thống Từ Trần Gia Câu (Tập 1)</a>
         <a class="tj-chip" href="/vi/books/chen_village_vol2_vi.html">Chỉ Dẫn Truyền Thống Từ Trần Gia Câu (Tập 2)</a>
         <a class="tj-chip" href="/vi/books/body_mechanics_vi.html">Cơ Học Thân Thể Trong Thái Cực Quyền</a>
@@ -232,6 +264,14 @@
         <a class="tj-chip" href="/vi/books/wu_style_taijiquan_xu_zhiyi_vi.html">Ngô Thức Thái Cực Quyền</a>
         <a class="tj-chip" href="/vi/books/wu_hao_style_taijiquan_hao_shaoru_vi.html">Võ Thức Thái Cực Quyền — Bản Dịch Trọn Bộ</a>
         <a class="tj-chip" href="/vi/books/sun_style_taijiquan_sun_jianyun_vi.html">Tôn Thức Thái Cực Quyền — Bản Dịch Trọn Bộ</a>
+      </div>
+    </div>
+    <div class="tjb-group">
+      <div class="tjb-group-head">
+        <span class="tjb-group-label">🥋 Võ Thuật — Martial Arts</span>
+        <span class="tjb-group-count">8</span>
+      </div>
+      <div class="tjb-chips">
         <a class="tj-chip" href="/vi/books/karate_do_my_way_of_life_vi.html">Karate-dō: Con Đường Sống Của Tôi (Karate-do: My Way of Life)</a>
         <a class="tj-chip" href="/vi/books/the_book_of_five_rings_vi.html">Ngũ Luân Thư (The Book of Five Rings)</a>
         <a class="tj-chip" href="/vi/books/ky_do_jodo_vi.html">Jo Đạo — Sách Hướng Dẫn (Jodo Manual)</a>
@@ -240,6 +280,14 @@
         <a class="tj-chip" href="/vi/books/hakkoryu_vi.html">Bí Mật Hakkoryu Jujutsu — Kỹ Thuật Shodan</a>
         <a class="tj-chip" href="/vi/books/jiujitsu_vi.html">Jiu-Jitsu Toàn Tập — Giáo Trình Tự Vệ Trọn Bộ</a>
         <a class="tj-chip" href="/vi/books/tegner_vi.html">Tự Vệ: Trung Tâm Thần Kinh Và Huyệt Đạo</a>
+      </div>
+    </div>
+    <div class="tjb-group">
+      <div class="tjb-group-head">
+        <span class="tjb-group-label">🥋 Hiệp Khí Đạo — Aikido</span>
+        <span class="tjb-group-count">10</span>
+      </div>
+      <div class="tjb-chips">
         <a class="tj-chip" href="/vi/books/aikido_takemusu_vol1_vi.html">Takemusu Aikido &mdash; Tập 1: Nền Tảng &amp; Kỹ Thuật Cơ Bản</a>
         <a class="tj-chip" href="/vi/books/aikido_roedel_basics_vi.html">Aikido &mdash; Những Điều Cơ Bản</a>
         <a class="tj-chip" href="/vi/books/aikido_tohei_vi.html">Aikido &mdash; Sự Điều Hoà Giữa Tâm Trí và Thân Thể để Tự Vệ</a>
@@ -250,15 +298,41 @@
         <a class="tj-chip" href="/vi/books/aikido_everyday_life_vi.html">Aikido Trong Đời Thường: Hòa Nhập Để Thắng Thế</a>
         <a class="tj-chip" href="/vi/books/aikido_meddict_vi.html">Aikido &mdash; Từ Điển Y Khoa, Thư Mục và Cẩm Nang Nghiên Cứu</a>
         <a class="tj-chip" href="/vi/books/aikido_total_aikido_vi.html">Total Aikido — Giáo Trình Tổng Hợp (The Master Course)</a>
+      </div>
+    </div>
+    <div class="tjb-group">
+      <div class="tjb-group-head">
+        <span class="tjb-group-label">🌿 Hoàng Đế Nội Kinh & Y Học Dưỡng Sinh</span>
+        <span class="tjb-group-count">2</span>
+      </div>
+      <div class="tjb-chips">
         <a class="tj-chip" href="/vi/books/hoang_de_noi_kinh_goc_nhin_tap_1_vi.html">Thuận Thiên Dưỡng Mệnh &amp; Nền Tảng Sinh Khí</a>
         <a class="tj-chip" href="/vi/books/hoang_de_noi_kinh_goc_nhin_tap_2_vi.html">Tạng Phủ, Kinh Lạc &amp; Nghệ Thuật Sống Khỏe</a>
+      </div>
+    </div>
+    <div class="tjb-group">
+      <div class="tjb-group-head">
+        <span class="tjb-group-label">☸ Thái Cực & Khí Công</span>
+        <span class="tjb-group-count">5</span>
+      </div>
+      <div class="tjb-chips">
         <a class="tj-chip" href="/vi/books/Beginners-guide-to-understanding-qigong_vi.html">Nhập Môn Hiểu Biết Khí Công</a>
         <a class="tj-chip" href="/vi/books/EightExtraordinaryMeridians-Qigong_vi.html">Qigong Bát Mạch Kỳ Kinh — Tám Kinh Lạc Kỳ Đặc</a>
         <a class="tj-chip" href="/vi/books/Dr.%20Yang%2C%20Jwing-Ming%20-%20Meridian%20Qigong%20Exercises_vi.html">Meridian Qigong Exercises — Khí Công Kinh Mạch</a>
         <a class="tj-chip" href="/vi/books/Chikung%20bible_vi.html">The Chikung Bible — Kinh Thánh Khí Công</a>
         <a class="tj-chip" href="/vi/books/martial_arts_qigong_health_vitality_vi.html">Martial Arts Qigong — Khí Công Võ Thuật Vì Sức Khỏe &amp; Sinh Lực</a>
+      </div>
+    </div>
+    <div class="tjb-group">
+      <div class="tjb-group-head">
+        <span class="tjb-group-label">📚 Erle Montaigue — Thư Viện Miễn Phí</span>
+        <span class="tjb-group-count">2</span>
+      </div>
+      <div class="tjb-chips">
         <a class="tj-chip" href="/vi/books/quan_shu_chen_shi_1995_vi.html">Toàn Thư Thái Cực Quyền</a>
         <a class="tj-chip" href="/vi/books/fu_yang_style_taijiquan_fu_zhongwen_vi.html">Dương Thức Thái Cực Quyền Đích Truyền</a>
+      </div>
+    </div>
   </div>
 </div>
 
