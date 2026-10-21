@@ -30,10 +30,45 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # ---------------------------------------------------------------------------
+      # Stage a slimmed copy of the tree instead of uploading everything.
+      #
+      # books/pdfs/ (~4.83 GB, 229 PDFs) is offloaded: every reader page now
+      # points at the PDFs in taichikb/taichinow-media via absolute
+      # raw.githubusercontent.com URLs, which serve the same bytes with
+      # Access-Control-Allow-Origin: * and are already used by the rest of the
+      # site. downloads/ (~15 MB) is referenced by nothing.
+      #
+      # That alone drops the artifact from ~8.67 GB to ~3.83 GB and roughly
+      # halves the upload + deploy steps. Everything a page actually loads from
+      # taichinow.github.io stays in the artifact.
+      #
+      # NOTE: tar is used rather than rsync, which is not guaranteed on the
+      # runner, and _site itself must be excluded so the tar does not read the
+      # directory it is filling.
+      # ---------------------------------------------------------------------------
+      - name: Stage site (exclude offloaded media)
+        run: |
+          set -eu
+          mkdir -p _site
+          : > /tmp/exclude.txt
+          printf '%s\n' "./.git" "./.github" "./books/pdfs" "./downloads" "./_site" >> /tmp/exclude.txt
+          echo "Exclusion entries: $(wc -l < /tmp/exclude.txt)"
+          tar --exclude-from=/tmp/exclude.txt -cf - . | tar -xf - -C _site
+          SIZE_MB=$(du -sm _site | cut -f1)
+          echo "Staged artifact size: ${SIZE_MB} MB"
+          if [ "$SIZE_MB" -gt 4500 ]; then
+            echo "::warning::Staged artifact is ${SIZE_MB} MB — larger than expected. Check what grew."
+          fi
+          if [ "$SIZE_MB" -gt 9000 ]; then
+            echo "::error::Staged artifact is ${SIZE_MB} MB — no smaller than the old full upload. Exclude list is not working." >&2
+            exit 1
+          fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: './_site'
 
       - name: Deploy to GitHub Pages
         id: deployment
