@@ -33,15 +33,24 @@ jobs:
       # ---------------------------------------------------------------------------
       # Stage a slimmed copy of the tree instead of uploading everything.
       #
-      # books/pdfs/ (~4.83 GB, 229 PDFs) is offloaded: every reader page now
-      # points at the PDFs in taichikb/taichinow-media via absolute
-      # raw.githubusercontent.com URLs, which serve the same bytes with
-      # Access-Control-Allow-Origin: * and are already used by the rest of the
-      # site. downloads/ (~15 MB) is referenced by nothing.
+      # GitHub Pages rejects artifacts over 1 GB and this tree is ~8.5 GB, so the
+      # large media directories are excluded and served from taichikb/taichinow-media
+      # instead, via absolute raw.githubusercontent.com URLs (same bytes, sent with
+      # Access-Control-Allow-Origin: *):
       #
-      # That alone drops the artifact from ~8.67 GB to ~3.83 GB and roughly
-      # halves the upload + deploy steps. Everything a page actually loads from
-      # taichinow.github.io stays in the artifact.
+      #   books/pdfs          ~4.83 GB  offloaded; reader pages use absolute URLs
+      #   assets/books        ~2.14 GB  offloaded; 99 pages rewritten to absolute
+      #   assets/images/books ~0.87 GB  offloaded; same rewrite
+      #   assets/pdf          ~0.00 GB  offloaded
+      #   downloads           ~0.02 GB  referenced by nothing
+      #
+      # This is the same exclusion list taichikb uses, so both sites now serve one
+      # corpus one way. Staged artifact: ~825 MB / 4,284 files.
+      #
+      # Before adding a tree here, check that nothing still points at it relatively:
+      # raw URLs render images fine, but PDFs must go through /pdf-viewer/?file=…,
+      # because raw.githubusercontent serves them as application/octet-stream and
+      # browsers will not render that inline.
       #
       # NOTE: tar is used rather than rsync, which is not guaranteed on the
       # runner, and _site itself must be excluded so the tar does not read the
@@ -52,16 +61,17 @@ jobs:
           set -eu
           mkdir -p _site
           : > /tmp/exclude.txt
-          printf '%s\n' "./.git" "./.github" "./books/pdfs" "./downloads" "./_site" >> /tmp/exclude.txt
+          printf '%s\n' "./.git" "./.github" "./_site" >> /tmp/exclude.txt
+          printf '%s\n' "./assets/books" "./assets/images/books" "./assets/pdf" "./books/pdfs" "./downloads" >> /tmp/exclude.txt
           echo "Exclusion entries: $(wc -l < /tmp/exclude.txt)"
           tar --exclude-from=/tmp/exclude.txt -cf - . | tar -xf - -C _site
           SIZE_MB=$(du -sm _site | cut -f1)
           echo "Staged artifact size: ${SIZE_MB} MB"
-          if [ "$SIZE_MB" -gt 4500 ]; then
-            echo "::warning::Staged artifact is ${SIZE_MB} MB — larger than expected. Check what grew."
+          if [ "$SIZE_MB" -gt 900 ]; then
+            echo "::warning::Staged artifact is ${SIZE_MB} MB — closing on the 1 GB Pages limit. Check what grew."
           fi
-          if [ "$SIZE_MB" -gt 9000 ]; then
-            echo "::error::Staged artifact is ${SIZE_MB} MB — no smaller than the old full upload. Exclude list is not working." >&2
+          if [ "$SIZE_MB" -gt 1024 ]; then
+            echo "::error::Staged artifact is ${SIZE_MB} MB — over the 1 GB Pages limit; the upload will be rejected." >&2
             exit 1
           fi
 
