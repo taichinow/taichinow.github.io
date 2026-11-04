@@ -31,54 +31,52 @@ jobs:
         uses: actions/configure-pages@v5
 
       # ---------------------------------------------------------------------------
-      # Stage a slimmed copy of the tree instead of uploading everything.
-      #
-      # GitHub Pages rejects artifacts over 1 GB and this tree is ~8.5 GB, so the
-      # large media directories are excluded and served from taichikb/taichinow-media
-      # instead, via absolute raw.githubusercontent.com URLs (same bytes, sent with
-      # Access-Control-Allow-Origin: *):
-      #
-      #   books/pdfs          ~4.83 GB  offloaded; reader pages use absolute URLs
-      #   assets/books        ~2.14 GB  offloaded; 99 pages rewritten to absolute
-      #   assets/images/books ~0.87 GB  offloaded; same rewrite
-      #   assets/pdf          ~0.00 GB  offloaded
-      #   downloads           ~0.02 GB  referenced by nothing
-      #
-      # This is the same exclusion list taichikb uses, so both sites now serve one
-      # corpus one way. Staged artifact: ~825 MB / 4,284 files.
-      #
-      # Before adding a tree here, check that nothing still points at it relatively:
-      # raw URLs render images fine, but PDFs must go through /pdf-viewer/?file=…,
-      # because raw.githubusercontent serves them as application/octet-stream and
-      # browsers will not render that inline.
-      #
-      # NOTE: tar is used rather than rsync, which is not guaranteed on the
-      # runner, and _site itself must be excluded so the tar does not read the
-      # directory it is filling.
+      # GitHub Pages rejects artifacts over 1 GB, and this site is ~8.4 GB on disk.
+      # Most bulk binaries live in the taichikb/taichinow-media repo and are
+      # referenced from the HTML by absolute raw.githubusercontent.com URLs, so
+      # they do not need to be in the Pages artifact:
+      #   books/pdfs          (~5.0 GB) offloaded; links rewritten to absolute URLs
+      #   assets/books        (~2.2 GB) offloaded; referenced only by absolute URLs
+      #   assets/images/books (~0.9 GB) offloaded; 24.5k img/href refs rewritten
+      #   downloads           (~0.02 GB) unreferenced A5 PDFs
+      #   assets/images/*     the ~0.44 GB subset in .github/pages-media-exclude.txt:
+      #                       files that NO page references, so dropping them is free
+      # assets/pdf/ (~0.59 GB) is ALSO offloaded: the reader pages now embed the
+      # PDFs from taichikb/taichinow-media via absolute raw.githubusercontent.com
+      # URLs (pdf.js works cross-origin: ACAO:* + 206 Range). So assets/pdf/ is
+      # added to the exclude list below, dropping the artifact to ~0.49 GB and
+      # clearing the 1 GB Pages cap. Everything else stays excluded.
+      # NOTE: tar is used rather than rsync, which is not guaranteed on the runner.
       # ---------------------------------------------------------------------------
       - name: Stage site (exclude offloaded media)
         run: |
           set -eu
           mkdir -p _site
+          # Build the exclusion list: the fully-offloaded trees plus the
+          # referenced-by-nothing images enumerated in the checked-in manifest.
           : > /tmp/exclude.txt
-          printf '%s\n' "./.git" "./.github" "./_site" >> /tmp/exclude.txt
-          printf '%s\n' "./assets/books" "./assets/images/books" "./assets/pdf" "./books/pdfs" "./downloads" >> /tmp/exclude.txt
+          printf '%s\n' "./.git" "./.github" "./assets/books" "./books/pdfs" \
+            "./assets/images/books" "./assets/pdf" "./downloads" "./_site" >> /tmp/exclude.txt
+          if [ -f .github/pages-media-exclude.txt ]; then
+            # manifest lines are repo-relative (assets/images/...) -> prefix "./"
+            sed -e 's/^/.\//' -e '/^\.\/$/d' .github/pages-media-exclude.txt >> /tmp/exclude.txt
+          fi
           echo "Exclusion entries: $(wc -l < /tmp/exclude.txt)"
           tar --exclude-from=/tmp/exclude.txt -cf - . | tar -xf - -C _site
+          # GitHub Pages rejects artifacts over 1 GB. All large binaries
+          # (assets/pdf/ included) are now excluded, so the artifact should sit
+          # well under the cap. Keep this guard as a hard safety net.
           SIZE_MB=$(du -sm _site | cut -f1)
           echo "Staged artifact size: ${SIZE_MB} MB"
-          if [ "$SIZE_MB" -gt 900 ]; then
-            echo "::warning::Staged artifact is ${SIZE_MB} MB — closing on the 1 GB Pages limit. Check what grew."
-          fi
-          if [ "$SIZE_MB" -gt 1024 ]; then
-            echo "::error::Staged artifact is ${SIZE_MB} MB — over the 1 GB Pages limit; the upload will be rejected." >&2
+          if [ "$SIZE_MB" -gt 985 ]; then
+            echo "::error::Pages artifact is ${SIZE_MB} MB — over the 985 MB safety margin (hard cap 1 GB). Find more unreferenced files to exclude." >&2
             exit 1
           fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './_site'
+          path: '_site'
 
       - name: Deploy to GitHub Pages
         id: deployment
