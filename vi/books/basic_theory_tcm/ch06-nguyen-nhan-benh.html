@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+
+:root{--accent-gold:#c59b27;--accent-crimson:#991b1b;--bg-primary:#fdfbf7;--text-primary:#1c1917;--text-secondary:#57534e;}
+body.dark-mode{--bg-primary:#121212;--text-primary:#f5f5f4;--text-secondary:#a8a29e;background-color:#121212!important;color:#f5f5f4!important;}
+*{box-sizing:border-box;}
+body{background:var(--bg-primary);color:var(--text-primary);font-family:'Inter',sans-serif;margin:0;line-height:1.7;}
+#reading-progress{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,#991b1b,#c59b27);z-index:9999;width:0%;transition:width .1s;}
+.reader-layout{display:block;max-width:900px;margin:0 auto;padding:2rem 1.5rem;}
+.breadcrumb{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.86rem;color:var(--text-secondary);padding:0 0 1.1rem;margin-bottom:1.6rem;border-bottom:1px solid #e7e5e4;}
+body.dark-mode .breadcrumb{border-color:#333;}
+.breadcrumb a{color:var(--accent-crimson);text-decoration:none;font-weight:600;}
+.breadcrumb .sep{color:#d6d3d1;}
+.toc-drawer{border:1px solid #e7e5e4;border-radius:10px;background:#fafaf9;margin-bottom:2rem;padding:.2rem 1rem;}
+body.dark-mode .toc-drawer{background:#1a1a1a;border-color:#2e2e2e;}
+.toc-drawer summary{cursor:pointer;font-size:.95rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--accent-crimson);padding:.9rem 0;display:flex;align-items:center;gap:8px;}
+.toc-list{list-style:none;padding:0;margin:0;}
+.toc-drawer .toc-list{max-height:60vh;overflow-y:auto;padding-bottom:.8rem;}
+.toc-item{margin-bottom:.35rem;}
+.toc-link{display:block;padding:.4rem .6rem;color:var(--text-secondary);text-decoration:none;border-radius:6px;font-size:.88rem;line-height:1.4;}
+.toc-link:hover{background:rgba(153,27,27,.08);color:var(--accent-crimson);font-weight:600;}
+.book-header{border-bottom:2px solid #e7e5e4;padding-bottom:2rem;margin-bottom:2.5rem;}
+.book-badge{display:inline-flex;align-items:center;gap:6px;background:#fef2f2;color:#991b1b;font-weight:600;font-size:.8rem;padding:4px 12px;border-radius:20px;border:1px solid #fecaca;margin-bottom:1rem;}
+.book-title{font-family:'Cormorant Garamond',serif;font-size:2.6rem;line-height:1.2;margin:0 0 1rem;}
+.book-meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;background:rgba(0,0,0,.02);padding:1.2rem;border-radius:8px;margin-top:1.5rem;border:1px solid #eee;}
+.meta-item strong{display:block;font-size:.75rem;text-transform:uppercase;color:#78716c;margin-bottom:2px;}
+.meta-item span{font-size:.95rem;}
+.pg{margin:0 0 1.6rem;}
+.pg h2{font-family:'Cormorant Garamond',serif;font-size:1.7rem;border-bottom:2px solid #991b1b;padding-bottom:.4rem;margin:2.4rem 0 1rem;color:var(--text-primary);}
+.pg h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin:1.8rem 0 .8rem;color:var(--accent-crimson);}
+.pg p{margin:0 0 .95rem;font-size:1.06rem;line-height:1.8;color:var(--text-secondary);}
+.pg .folio{font-size:.78rem;color:#a8a29e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem;}
+.page-nav{margin:3.5rem 0 1rem;padding-top:1.6rem;border-top:1px solid #e7e5e4;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+.page-nav a{color:var(--accent-crimson);text-decoration:none;font-weight:600;font-size:.92rem;padding:8px 14px;border-radius:8px;}
+.page-nav a.home{color:var(--accent-gold);}
+.page-nav a.disabled{color:#c7c2bd;pointer-events:none;}
+.site-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:1px solid #e7e5e4;background:#fff;}
+body.dark-mode .site-header{background:#1a1a1a;border-color:#333;}
+.site-header .brand{display:flex;align-items:center;gap:.5rem;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:1.3rem;color:var(--text-primary);text-decoration:none;}
+.site-header .brand svg{width:28px;height:28px;}
+.site-nav{display:flex;gap:1rem;flex-wrap:wrap;}
+.site-nav a{color:var(--text-secondary);text-decoration:none;font-size:.9rem;}
+.site-footer{text-align:center;padding:2rem 1rem;color:#a8a29e;font-size:.85rem;border-top:1px solid #e7e5e4;margin-top:3rem;}
+
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chương 6: Nguyên Nhân Bệnh — Lý Luận Cơ Bản Của Đông Y (Tập 2) | TaichiNOW</title>
+<meta name="description" content="Chương 6 của Lý Luận Cơ Bản Của Đông Y (Tập 2): Nguyên Nhân Bệnh">
+<link rel="icon" href="/assets/images/taiji-logo.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --bg-page: #fbfbfb;
+  --bg-card: #ffffff;
+  --bg-sidebar: #f4f4f5;
+  --ink: #18181b;
+  --ink-muted: #52525b;
+  --ink-faint: #a1a1aa;
+  --gold: #b45309;
+  --gold-light: #fef3c7;
+  --border: #e4e4e7;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --cjk: 'Noto Serif SC', serif;
+  --accent-red: #991b1b;
+  --accent-blue: #1e40af;
+  --accent-green: #065f46;
+}
+
+[data-theme="dark"] {
+  --bg-page: #09090b;
+  --bg-card: #18181b;
+  --bg-sidebar: #121214;
+  --ink: #f4f4f5;
+  --ink-muted: #a1a1aa;
+  --ink-faint: #71717a;
+  --gold: #f59e0b;
+  --gold-light: #451a03;
+  --border: #27272a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background-color: var(--bg-page);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.8;
+  font-size: 17px;
+  transition: background-color 0.25s, color 0.25s;
+}
+
+.reader-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+}
+[data-theme="dark"] .reader-header {
+  background: rgba(18, 18, 20, 0.95);
+}
+
+.brand-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.brand-area svg { width: 32px; height: 32px; }
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.btn-control {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--ink);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-control:hover {
+  background: var(--border);
+}
+
+#progress-container {
+  position: fixed;
+  top: 53px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: transparent;
+  z-index: 99;
+}
+#progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--gold), #ea580c);
+  transition: width 0.1s ease;
+}
+
+.book-wrapper {
+  max-width: 1380px;
+  margin: 0 auto;
+  display: flex;
+  min-height: calc(100vh - 60px);
+}
+
+.book-sidebar {
+  width: 330px;
+  flex-shrink: 0;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  position: sticky;
+  top: 56px;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+}
+.toc-title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  font-weight: 700;
+  margin-bottom: 12px;
+  padding-left: 8px;
+}
+.toc-nav ul { list-style: none; }
+.toc-nav li { margin-bottom: 4px; }
+.toc-nav a {
+  display: block;
+  padding: 8px 12px;
+  color: var(--ink-muted);
+  text-decoration: none;
+  font-size: 0.92rem;
+  border-radius: 6px;
+  transition: all 0.15s;
+  line-height: 1.4;
+}
+.toc-nav a:hover, .toc-nav a.active {
+  color: var(--ink);
+  background: var(--bg-card);
+  font-weight: 600;
+  border-left: 3px solid var(--gold);
+}
+.toc-nav .sub-item {
+  padding-left: 20px;
+  font-size: 0.86rem;
+}
+
+.book-content {
+  flex-grow: 1;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 32px 100px;
+}
+
+.book-hero {
+  text-align: center;
+  padding-bottom: 40px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+}
+.book-hero .badge {
+  display: inline-block;
+  background: var(--gold-light);
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.book-hero h1 {
+  font-family: var(--serif);
+  font-size: 2.8rem;
+  line-height: 1.2;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.book-hero .subtitle {
+  font-size: 1.25rem;
+  color: var(--ink-muted);
+  font-style: italic;
+  margin-bottom: 16px;
+}
+.book-hero .meta-row {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  color: var(--ink-faint);
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+}
+
+h2 {
+  font-family: var(--serif);
+  font-size: 2.1rem;
+  font-weight: 600;
+  margin: 50px 0 20px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border);
+  color: var(--ink);
+  scroll-margin-top: 80px;
+}
+h3 {
+  font-family: var(--serif);
+  font-size: 1.55rem;
+  font-weight: 600;
+  margin: 32px 0 14px;
+  color: var(--gold);
+  scroll-margin-top: 80px;
+}
+h4 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 24px 0 10px;
+}
+p { margin-bottom: 1.4rem; }
+
+.callout {
+  background: var(--bg-sidebar);
+  border-left: 4px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+  padding: 18px 22px;
+  margin: 24px 0;
+}
+.callout.chinese-quote {
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  line-height: 1.6;
+  border-left-color: var(--accent-red);
+  background: rgba(153, 27, 27, 0.04);
+}
+.callout .cjk-text {
+  font-family: var(--cjk);
+  font-size: 1.4rem;
+  display: block;
+  margin-bottom: 6px;
+  color: var(--accent-red);
+}
+
+.key-takeaway {
+  background: rgba(6, 95, 70, 0.05);
+  border: 1px solid rgba(6, 95, 70, 0.2);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin: 24px 0;
+}
+.key-takeaway h4 {
+  color: var(--accent-green);
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.book-figure {
+  margin: 32px auto;
+  text-align: center;
+}
+.book-figure img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  border: 1px solid var(--border);
+}
+.book-figure figcaption {
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+  margin-top: 10px;
+  font-style: italic;
+}
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 0.95rem;
+}
+.styled-table th, .styled-table td {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+.styled-table th {
+  background: var(--bg-sidebar);
+  font-weight: 700;
+  color: var(--ink);
+}
+.styled-table tr:nth-child(even) {
+  background: rgba(0,0,0,0.02);
+}
+
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.chapter-nav a {
+  text-decoration: none;
+  color: var(--gold);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.chapter-nav a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .book-wrapper { flex-direction: column; }
+  .book-sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+</style>
+<style>
+
+:root{
+  /* Cormorant Garamond covers Vietnamese; Georgia does NOT (U+1EA0–U+1EF9).
+     Keep a Vietnamese-safe face ahead of Georgia in the fallback chain. */
+  --serif:'Cormorant Garamond','Palatino Linotype',Cambria,'Times New Roman','Noto Serif',Georgia,serif;
+  --zhfont:'Songti SC','SimSun','Noto Serif CJK SC',serif;
+}
+body{font-size:17px;}
+.wrap{max-width:820px;}
+h1{font-size:2.15rem;}
+h2{font-size:1.62rem;margin-top:2.9rem;padding-top:1.4rem;border-top:1px solid var(--line);}
+h2:first-of-type{border-top:none;padding-top:0;margin-top:1.4rem;}
+h3{font-family:var(--serif);font-size:1.28rem;font-weight:600;color:#0f172a;
+  margin-top:2.3rem;margin-bottom:.2rem;}
+
+p{font-size:1.02rem;line-height:1.82;text-align:justify;hyphens:auto;margin-top:.85rem;}
+p.lead{font-size:1.1rem;}
+sup.ref{font-size:.66em;color:var(--gold);font-weight:600;padding-left:1px;}
+.zh{font-family:var(--zhfont);}
+
+/* classical quotations, set off from the argument */
+blockquote{margin:1.3em 0 1.5em;padding:.2em 0 .2em 22px;
+  border-left:2px solid var(--line);color:#403a34;font-size:1rem;line-height:1.8;}
+blockquote p{margin:0 0 .6em;}
+blockquote p:last-child{margin-bottom:0;}
+
+/* footnotes, kept page by page as printed */
+ol.fn{margin:1rem 0 .2rem;padding:.8rem 0 0 1.5rem;border-top:1px solid var(--line);
+  font-size:.79rem;line-height:1.7;color:#64748b;}
+ol.fn li{margin-bottom:.35rem;}
+ol.fn .zh{font-size:.92em;}
+
+.badge{display:inline-block;font-family:var(--sans);font-size:.74rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:#0f766e;background:#ccfbf1;
+  border-radius:999px;padding:.3rem .85rem;margin:.9rem 0 .2rem;}
+.note{margin-top:2.6rem;padding:1.3rem 1.5rem;background:#f8fafc;
+  border:1px solid var(--line);border-radius:8px;}
+.note h5{font-family:var(--sans);font-size:.76rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:#64748b;margin-bottom:.7rem;}
+.note p{font-size:.87rem;line-height:1.75;color:#475569;margin-top:.7rem;}
+
+.diagram{margin:1.7em 0;padding:1.1rem 1.2rem;background:#f8fafc;
+  border:1px solid var(--line);border-radius:8px;}
+.diagram .dg-root{font-family:var(--serif);font-size:1.05rem;font-weight:600;
+  color:#0f172a;text-align:center;margin-bottom:.75rem;}
+.diagram .dg-branches{display:flex;flex-direction:column;gap:.5rem;align-items:center;}
+.diagram .dg-row{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;
+  justify-content:center;font-family:var(--sans);font-size:.82rem;}
+.diagram .dg-node{display:inline-block;background:#fff;border:1px solid var(--line);
+  border-radius:5px;padding:.28rem .6rem;color:#334155;}
+.diagram .dg-arrow{color:var(--gold);font-weight:700;}
+.diagram figcaption{margin-top:.85rem;font-family:var(--sans);font-size:.78rem;
+  line-height:1.65;color:#64748b;}
+
+@media(max-width:640px){
+  h1{font-size:1.6rem;}
+  h2{font-size:1.3rem;}
+  body{font-size:16px;}
+  .note{padding:1rem;}
+}
+
+
+
+/* ZHONGJING-STYLE TABLE + PLATE SUPPORT (essay 7) */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table.tbl{width:100%;border-collapse:collapse;margin:1.7em 0 1.9em;font-size:.86rem;line-height:1.6;}
+table.tbl caption{caption-side:top;text-align:left;font-family:var(--sans);font-size:.8rem;
+  font-weight:700;letter-spacing:.02em;color:#475569;padding-bottom:.55rem;}
+table.tbl th,table.tbl td{border:1px solid #d8d2c6;padding:.4rem .55rem;vertical-align:top;text-align:left;}
+table.tbl th{background:#f5f1e8;font-family:var(--sans);font-size:.76rem;font-weight:700;
+  text-align:center;color:#334155;}
+table.tbl td.n{width:2.4rem;text-align:center;color:#94a3b8;font-family:var(--sans);font-size:.78rem;}
+table.tbl .zh{font-size:.92em;}
+figure.ms{margin:1.9em 0;text-align:center;}
+figure.ms img{max-width:290px;width:100%;height:auto;border:1px solid #d8d2c6;background:#fff;padding:4px;}
+figure.ms figcaption{margin-top:.6rem;font-family:var(--sans);font-size:.78rem;
+  line-height:1.6;color:#64748b;}
+@media(max-width:640px){
+  table.tbl{font-size:.78rem;min-width:520px;}
+  table.tbl th,table.tbl td{padding:.3rem .35rem;}
+}
+
+
+/* --- split-reader navigation (Y Giả Ý Dã) --- */
+.tocbar{margin:1.1rem 0 1.8rem;padding:.75rem 1rem;background:#f8fafc;
+  border:1px solid var(--line);border-radius:8px;font-family:var(--sans);
+  font-size:.86rem;line-height:2.1;}
+.tocbar a{display:inline-block;margin-right:.35rem;padding:.28rem .7rem;
+  border:1px solid var(--line);border-radius:999px;background:#fff;
+  color:#0f766e;text-decoration:none;}
+.tocbar a:hover{background:#f0fdfa;text-decoration:underline;}
+.tocbar .sep{color:#94a3b8;margin:0 .2rem;}
+.chead{font-family:var(--sans);font-size:.74rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:#0f766e;margin:.2rem 0 .5rem;}
+.partnav{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;
+  margin:2.6rem 0 1rem;padding-top:1.2rem;border-top:1px solid var(--line);font-size:.9rem;}
+.partnav a{color:#0f766e;text-decoration:none;max-width:44%;}
+.partnav a:hover{text-decoration:underline;}
+.partnav .k{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+  color:#64748b;margin-bottom:3px;font-weight:600;}
+.partnav .disabled{color:#94a3b8;opacity:.6;max-width:44%;}
+.partnav .disabled .k{color:#94a3b8;}
+.tocwrap{margin:1.6rem 0 0;}
+.toclist{list-style:none;margin:.5rem 0 1.8rem;padding:0;}
+.toclist li{border-bottom:1px solid var(--line);}
+.toclist li a{display:flex;gap:.85rem;align-items:baseline;padding:.62rem .3rem;
+  text-decoration:none;color:#0f172a;}
+.toclist li a:hover{background:#f8fafc;}
+.toclist .num{font-family:var(--sans);min-width:2.6rem;text-align:center;
+  background:#e2e8f0;color:#1e293b;border-radius:999px;padding:.12rem .5rem;
+  font-size:.72rem;font-weight:700;white-space:nowrap;}
+.toclist .ttl{font-family:var(--serif);font-size:1.04rem;line-height:1.45;}
+.toclist .pg{margin-left:auto;font-family:var(--sans);font-size:.76rem;
+  color:#64748b;white-space:nowrap;}
+.toclist li.pending{display:flex;gap:.85rem;align-items:baseline;
+  padding:.62rem .3rem;opacity:.62;}
+.toclist li.pending .num{background:#f1f5f9;color:#94a3b8;}
+.toclist li.pending .ttl{color:#64748b;}
+.toclist li.pending .pg{color:#94a3b8;}
+p.tnote{font-family:var(--sans);font-size:.82rem;line-height:1.7;color:#64748b;
+  margin-top:1.4rem;}
+.tocbar a,.tnote a,.partnav a{color:#0f766e;}
+.tnote a{text-decoration:none;}
+.tnote a:hover{text-decoration:underline;}
+h2.tocpart-h{font-family:var(--sans);font-size:.78rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:#0f766e;margin:2rem 0 .2rem;
+  padding-top:1rem;border-top:1px solid var(--line);}
+h2[id],h3[id],h2.part{scroll-margin-top:4.5rem;}
+@media(max-width:640px){.partnav{flex-direction:column;gap:10px;}
+  .partnav a,.partnav .disabled{max-width:100%;}
+  .toclist li a,.toclist li.pending{flex-wrap:wrap;}
+  .toclist .pg{margin-left:3.4rem;}}
+/* --- chapter-level TOC / per-essay pages (mirrors the_trigger_point_manual) --- */
+ul.chlist{list-style:none;margin:.5rem 0 1.8rem;padding:0;}
+ul.chlist li{margin:0;padding:.34rem 0;border-bottom:1px dotted #e2e8f0;}
+ul.chlist li:last-child{border-bottom:0;}
+ul.chlist a{color:#0f172a;text-decoration:none;display:flex;gap:.6rem;align-items:baseline;}
+ul.chlist a:hover{color:#0f766e;}
+ul.chlist .num{flex:0 0 2.1rem;color:#94a3b8;font-variant-numeric:tabular-nums;
+  font-size:.86rem;}
+ul.chlist .ttl{flex:1;line-height:1.45;}
+h2.tocpart-h .partlink{float:right;font-family:var(--sans);font-size:.74rem;
+  font-weight:600;text-transform:none;letter-spacing:0;}
+.chapter-nav{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;
+  margin:2.6rem 0 1rem;padding-top:1.2rem;border-top:1px solid var(--line);font-size:.9rem;}
+.chapter-nav a{color:#0f766e;text-decoration:none;max-width:44%;}
+.chapter-nav a:hover{text-decoration:underline;}
+.chapter-nav .k{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+  color:#64748b;margin-bottom:3px;font-weight:600;}
+.chapter-nav .disabled{color:#94a3b8;opacity:.6;max-width:44%;}
+.chapter-nav .disabled .k{color:#94a3b8;}
+.chsecnav{margin:1rem 0 1.6rem;font-size:.86rem;line-height:1.9;color:#334155;
+  background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:.7rem 1rem;}
+.chsecnav a{color:#0f766e;text-decoration:none;}
+.chsecnav a:hover{text-decoration:underline;}
+.chsecnav .lab{display:block;font-family:var(--sans);font-size:.7rem;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;color:#64748b;margin-bottom:.15rem;}
+h3.chapter{scroll-margin-top:4.5rem;}
+p.introlab{font-family:var(--sans);font-size:.74rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:#64748b;margin:0 0 .8rem;}
+@media(max-width:640px){.chapter-nav{flex-direction:column;gap:10px;}
+  .chapter-nav a,.chapter-nav .disabled{max-width:100%;}}
+</style>
+
+<style>
+/* BTCM cleanup: styled lists, subheadings and muted credits inside .pg */
+.pg ul{margin:0 0 1.2rem;padding-left:1.5rem;list-style:disc;}
+.pg ol{margin:0 0 1.2rem;padding-left:1.5rem;}
+.pg li{margin:0 0 .35rem;font-size:1.02rem;line-height:1.75;color:var(--text-secondary);}
+.pg h4{font-family:'Cormorant Garamond',serif;font-size:1.1rem;margin:1.5rem 0 .6rem;color:var(--accent-crimson);}
+.pg .subtle{color:#a8a29e;font-size:.88rem;}
+.pg a{color:var(--accent-crimson);text-decoration:none;}
+.pg a:hover{text-decoration:underline;}
+.pg .toctable{list-style:none;padding:0;margin:0 0 1.5rem;}
+.pg .toctable li{display:flex;justify-content:space-between;gap:1rem;
+  padding:.3rem 0;border-bottom:1px dotted var(--border);margin:0;}
+.pg .toctable li.grp{font-weight:700;color:var(--accent-red);
+  border-bottom:1px solid var(--border);margin-top:1.1rem;}
+.pg .toctable li.sub{padding-left:1.5rem;font-size:.95rem;}
+.pg .toctable .p{color:var(--ink-faint);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.pg strong{color:var(--text-primary);}
+</style>
+</head>
+<body>
+
+<header class="reader-header">
+  <a href="/" class="brand-area">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="98" fill="#ffffff" stroke="#000000" stroke-width="4"/><path d="M 100,2 A 98,98 0 0,1 100,198 A 49,49 0 0,1 100,100 A 49,49 0 0,0 100,2 Z" fill="#000000"/><circle cx="100" cy="51" r="12" fill="#ffffff"/><circle cx="100" cy="149" r="12" fill="#000000"/></svg>
+    <span>TaichiNOW</span>
+  </a>
+  <div class="header-controls">
+    <a href="/vi/books/" class="btn-control"><i class="fa-solid fa-book-open"></i> Thư Viện Sách</a>
+    <button class="btn-control" id="font-down" title="Giảm cỡ chữ">A-</button>
+    <button class="btn-control" id="font-up" title="Tăng cỡ chữ">A+</button>
+    <button class="btn-control" id="theme-toggle" title="Đổi giao diện"><i class="fa-solid fa-moon"></i></button>
+  </div>
+</header>
+
+<div id="progress-container"><div id="progress-bar"></div></div>
+
+<div class="book-wrapper">
+  <!-- MỤC LỤC ĐIỀU HƯỚNG BÊN TRÁI -->
+  <aside class="book-sidebar">
+    <div class="toc-title">Mục Lục Toàn Thư</div>
+    <nav class="toc-nav">
+      <ul>
+        <li><a href="ch01-ly-thuyet-ban.html#sec00">Lý Thuyết Cơ Bản</a></li>
+        <li><a href="ch02-nha-xuat-ban-thuc-dung.html#sec01">Nhà Xuất Bản Thực Dụng</a></li>
+        <li><a href="ch03-ban-chi-dao.html#sec02">Ban Chỉ Đạo</a></li>
+        <li><a href="ch04-ban-bien-tap-dich-thuat.html#sec03">Ban Biên Tập Và Dịch Thuật</a></li>
+        <li><a href="ch05-muc-luc.html#sec04">Mục Lục</a></li>
+        <li><a href="ch06-nguyen-nhan-benh.html#sec05">Nguyên Nhân Bệnh</a></li>
+        <li><a href="ch07-benh-co.html#sec06">Bệnh Cơ</a></li>
+        <li><a href="ch08-du-phong.html#sec07">Dự Phòng</a></li>
+        <li><a href="ch09-dieu-tri.html#sec08">Điều Trị</a></li>
+        <li><a href="ch10-xuat-ban-kem.html#sec09">Xuất Bản Kèm Theo</a></li>
+      </ul>
+    </nav>
+  </aside>
+  <!-- NỘI DUNG SÁCH CHÍNH -->
+  <main class="book-content" id="book-content">
+<nav class="tocbar"><a href="./">← Mục lục sách</a><span class="sep">·</span><a href="../basic_theory_tcm_vi.html">Đọc toàn bộ trong một trang</a><span class="sep">·</span><a href="./index.html">Trang mục</a></nav>
+<p class="chead">Lý Luận Cơ Bản Của Đông Y (Tập 2) · Thạch Lan Hoa</p>
+<h3 class="chapter" id="ch06">Nguyên Nhân Bệnh</h3>
+
+<div class="partnav"><a href="ch05-muc-luc.html"><span class="k">← Chương 5</span>Mục Lục</a>
+<a href="./" style="text-align:center"><span class="k">Trang chủ</span>Mục lục sách</a>
+<a href="ch07-benh-co.html" style="text-align:right"><span class="k">Chương 7 →</span>Bệnh Cơ</a>
+</div>
+<p class="tnote">Bản dịch tiếng Việt trên TaichiNOW. Nội dung gốc: Thạch Lan Hoa.</p>
+
+<section class="pg">
+<h2>Chương một — Nguyên Nhân Bệnh</h2>
+<p>Nguyên nhân bệnh là gì? Nguyên nhân bệnh chỉ các loại yếu tố gây ra bệnh tật, chủ yếu gồm lục dâm, tà khí ôn dịch (lệ khí), nội thương do thất tình, ăn uống không điều độ, lao dật thất thường và ngoại thương do phẫu thuật.</p>
+<p>Trong việc nhận biết nguyên nhân bệnh, ngoài việc hiểu rõ những điều kiện khách quan có thể là yếu tố gây bệnh, Đông y chủ yếu dựa vào biểu hiện lâm sàng của bệnh, thông qua phân tích các triệu chứng và thể trạng của bệnh để truy tìm nguyên nhân, từ đó cung cấp căn cứ cho việc điều trị và dùng thuốc. Phương pháp này gọi là "biện chứng cầu nhân".</p>
+<p>Việc phân loại nguyên nhân bệnh ở các thầy thuốc thời đại khác nhau không giống nhau. Ví dụ, Hoàng Đế Nội Kinh (722-221 TCN) lần đầu tiên phân chúng thành hai loại: âm và dương. Đến thời Đông Hán (25-220 SCN), Trương Trọng Cảnh đã chỉ ra trong Kim Quỹ Yếu Lược (219 SCN) rằng nguyên nhân bệnh có thể được phân thành ba loại. Ông nói: "Tuy bệnh có muôn vàn, nhưng không vượt ra ngoài ba loại: loại thứ nhất, tà khí xâm phạm kinh lạc, rồi lại ảnh hưởng đến tạng phủ gây bệnh bên trong; loại thứ hai, tứ chi và cửu khiếu bị ảnh hưởng— truyền lẫn nhau dẫn đến tắc nghẽn: những bệnh như vậy.</p>
+<p>Từ câu "tuy bệnh có muôn vàn, không vượt ra ngoài ba loại" trong Kim Quỹ Yếu Lược, Trần Vô Trạch đời Tống (960-1279) đã đưa ra "thuyết tam nhân", phân loại nguyên nhân bệnh thành ba loại, tức là: lục dâm ngoại tập là ngoại nhân; tình chí nội thương là nội nhân; ăn uống đói no cùng với các chấn thương như té ngã, gãy xương, giập và bong gân, vết thương do đao chém và thương tích do côn trùng, động vật là bất nội ngoại nhân. Tôi cho rằng các loại nguyên nhân bệnh đều thuộc ngoại nhân, còn sự tương đối hư nhược của chính khí trong cơ thể con người mới là nội nhân. Trong hoàn cảnh thông thường, ngoại nhân phát huy tác dụng thông qua nội nhân. Nay xin lần lượt trình bày một số nguyên nhân bệnh thường gặp như sau:</p>
+<h3>Mục 1</h3>
+<h3>Lục dâm</h3>
+<p>Lục dâm là tên gọi chung của sáu thứ khí hậu quá độ trở thành nguyên nhân bệnh: phong, hàn, thử, thấp, táo và hỏa. Trong điều kiện bình thường, chúng vốn là sáu biến đổi khí hậu bình thường của tự nhiên, nên còn được gọi là "lục khí". Con người sống trong tự nhiên và có khả năng thích ứng nhất định với các biến đổi khí hậu, cho nên sáu nhân tố tự nhiên bình thường không thể khiến người ta mắc bệnh. Nhưng nếu các biến đổi khí hậu quá bất thường, sự xuất hiện của sáu nhân tố tự nhiên quá thừa hoặc quá thiếu, hoặc trái mùa, và nếu các biến đổi khí hậu quá nhanh và dữ dội, trong khi chính khí của cơ thể hư nhược, không thể thích ứng với biến đổi khí hậu của tự nhiên, thì sáu nhân tố tự nhiên sẽ xâm phạm cơ thể con người và gây bệnh. Sáu nhân tố tự nhiên trong hoàn cảnh đó được gọi là "lục dâm". "Dâm" ở đây hàm ý quá độ. Vì lục dâm là những tà khí bất chính gây bệnh, nên chúng còn được gọi là "lục tà".</p>
+<h3>Những đặc điểm gây bệnh chung của lục dâm là:</h3>
+<p>① Chúng thường gây bệnh liên quan đến khí hậu theo mùa và môi trường cư trú. Ví dụ, mùa xuân nhiều bệnh do phong; mùa hè nhiều bệnh do thử; mùa thu nhiều bệnh do táo; mùa đông nhiều bệnh do hàn. Sống lâu ở nơi ẩm thấp thì dễ bị thấp xâm, ở nơi nhiệt độ cao thì dễ bị trúng nắng.</p>
+<p>② Lục dâm có thể xâm phạm cơ thể đơn độc, hoặc đồng thời hai thứ trở lên kết hợp gây bệnh. Ví dụ, cảm mạo thể phong hàn và tý chứng thể phong hàn thấp.</p>
+<p>③ Trong những điều kiện nhất định, lục dâm sau khi xâm nhập cơ thể con người có thể chuyển hóa lẫn nhau. Ví dụ, hàn tà sau khi vào trong có thể hóa nhiệt, còn thử thấp lâu ngày có thể hóa táo làm tổn thương âm. ④ Lục dâm gây một số bệnh chủ yếu bằng cách xâm nhập cơ thể qua da, hoặc qua miệng mũi, hoặc cả hai, do đó những bệnh gây ra theo cách này được gọi là "ngoại cảm bệnh".</p>
+<p>Theo quan điểm của y học hiện đại, ngoài các nhân tố khí hậu, bệnh do lục dâm còn bao gồm những biến đổi bệnh lý do tác dụng của các yếu tố sinh học (vi khuẩn, vi-rút, v.v.), lý học, hóa học và nhiều nguyên nhân bệnh khác tác dụng lên cơ thể con người.</p>
+<p>Ngoài ra, còn có một thuyết gọi là "nội sinh ngũ tà", chỉ những chứng tương tự phong, hàn, thấp, táo và hỏa do công năng của tạng phủ rối loạn. Để tiện cho việc biện chứng, chúng được gọi là nội phong, nội hàn, nội thấp, nội táo và nội hỏa. Chúng được trình bày chung với lục dâm ở phần sau.</p>
+<p>1. Phong — Phong là chủ khí của mùa xuân, nhưng bốn mùa đều có phong. Cho nên bệnh do phong tà tuy thường gặp vào mùa xuân nhưng không chỉ giới hạn ở mùa xuân. Phong tà có phân biệt ngoại phong và nội phong. Ngoại phong phần nhiều do phong khí quá thịnh, là một nguyên nhân bệnh cực kỳ quan trọng trong các bệnh do ngoại tà sinh ra. Nội phong phần nhiều do công năng của Can rối loạn gây nên. Cho nên thiên "Chí Chân Yếu Đại Luận" trong Tố Vấn rằng các chứng phong đều do sự rối loạn của Can gây ra." Tính chất và đặc điểm gây bệnh của phong tà như sau:</p>
+<p>1) Phong tà tính động, có xu hướng thăng phát, hướng lên và ra ngoài, nên thuộc dương tà. Khi phong tà gây bệnh, dễ khiến tấu lý khai tiết, xuất hiện các triệu chứng như sợ gió, ra mồ hôi. Phong tà xâm phạm thường làm tổn thương phần trên của cơ thể (đầu mặt), cơ biểu, gây đau đầu, chóng mặt, méo miệng lệch mắt, v.v.</p>
+<p>2) Phong tà thiện hành nhi số biến (dễ di chuyển và thay đổi). "Thiện hành" nghĩa là khi phong tà xâm phạm cơ thể, các triệu chứng sinh ra hoặc vị trí bệnh có xu hướng không ổn định và di chuyển. Ví dụ, trong phong tý, cơn đau ở các khớp tứ chi có tính du tẩu. "Số biến" nghĩa là bệnh do phong tà thường phát sinh nhanh chóng, thất thường và biến đổi khôn lường. Ví dụ, người bị trúng phong thường đột ngột ngất đi, bất tỉnh nhân sự; ở người bị mày đay, ngứa da xuất hiện ở vị trí không cố định, chỗ này chỗ kia.</p>
+<p>3) Phong tính chủ động. Điều này có nghĩa các triệu chứng và thể trạng của bệnh do phong tà có đặc điểm rung động, lay chuyển không tự chủ, như run rẩy, co giật và chóng mặt.</p>
+<p>4) Phong là trưởng của trăm bệnh. Phong là nguyên nhân bệnh quan trọng nhất trong lục dâm, là kẻ dẫn đầu của ngoại tà gây bệnh; các tà khí khác phần nhiều nương vào phong để xâm phạm cơ thể, như chứng phong hàn, chứng phong nhiệt và chứng phong thấp.</p>
+<p>2. Hàn — Hàn là chủ khí của mùa đông, các mùa khác cũng có thể thấy. Hàn tà có phân biệt ngoại hàn và nội hàn. Ngoại hàn là chỉ hàn tà từ bên ngoài xâm phạm; nội hàn là biểu hiện bệnh lý của dương khí bất túc, mất đi sự ôn húy. Hai thứ vừa có khác biệt, vừa có liên hệ. Cơ thể dương hư nội hàn thì dễ cảm thụ ngoại hàn; còn ngoại hàn xâm nhập cơ thể, tích lâu không tán, lại có thể tổn hại dương khí, dẫn đến nội hàn. Tính chất và đặc điểm gây bệnh của hàn tà như sau:</p>
+<p>1) Hàn là âm tà, dễ làm tổn thương dương khí. Hàn tính thuộc âm, nên khi hàn tà gây bệnh thì nó dễ làm tổn thương dương khí của cơ thể con người nhất. Ví dụ, khi hàn tà xâm phạm phần biểu của cơ thể và vệ dương bị ức chế, có thể xuất hiện sợ lạnh; khi hàn tà trực tiếp xâm phạm Tỳ Vị và dương khí trung tiêu do đó bị tổn thương, có thể phát sinh đau bụng lạnh.</p>
+<p>2) Hàn tính ngưng trệ. Khi hàn tà xâm phạm cơ thể con người, nó có thể làm ngưng trệ khí huyết trong kinh mạch, cản trở sự vận hành, gây ra đủ loại đau đớn.</p>
+<p>3) Hàn tính thu dẫn. Khi hàn tà xâm nhập cơ thể, nó có thể khiến khí cơ thu liễm, làm cơ tấu, kinh lạc và cân mạch co rút mà sinh co cứng và co giật. Ví dụ, khi hàn tà xâm phạm cơ biểu, lỗ chân lông và cơ tấu khép lại co rút, vệ dương bị uất bế, không thể ra ngoài, dẫn đến sợ lạnh kèm phát sốt và không ra mồ hôi; nếu hàn tà xâm phạm kinh lạc và khớp, sẽ xảy ra co cơ và cử động gấp duỗi khớp bị trở ngại.</p>
+<p>3. Thử (nắng nóng) — Thử là chủ khí của mùa hè. Nó do hỏa nhiệt hóa thành. Thử thuần túy là ngoại tà. Tính chất và đặc điểm gây bệnh của nó như sau:</p>
+<p>1) Thử là dương tà, tính nóng bức. Thử do khí nóng bức của mùa hè hóa thành, mà nóng bức thuộc dương, nên thử là dương tà. Khi thử tà xâm phạm cơ thể, thường xuất hiện các triệu chứng như sốt cao, bực bội trong lòng, mặt đỏ và mạch hồng đại (mạch nhanh căng đầy).</p>
+<p>2) Thử tính thăng tán, hao khí thương tân dịch. Thử tà gây bệnh thường gây bệnh bằng cách làm khai mở tấu lý da thịt và tân dịch, dẫn đến khát và muốn uống nước, môi lưỡi khô, nước tiểu ít và sẫm màu. Cùng với việc ra nhiều mồ hôi, khí cũng thoát theo tân dịch, dẫn đến khí hư, gây khó thở, mệt mỏi, thậm chí đột ngột ngất đi và bất tỉnh nhân sự.</p>
+<p>3) Thử thường kèm theo thấp. Mùa hè là mùa nóng bức, mưa nhiều, nên thử tà gây bệnh thường kèm thấp tà. Ngoài các triệu chứng thử nhiệt như phát sốt, khát nước, v.v., biểu hiện lâm sàng thường kèm theo tứ chi mỏi mệt, ngực đầy tức, nôn mửa, buồn nôn và phân lỏng dính.</p>
+<h3>4. Thấp</h3>
+<p>Thấp là chủ khí của cuối hè. Cuối hè là thời điểm mùa hè chuyển sang mùa thu, là mùa thấp khí thịnh nhất trong năm, nên mùa này dễ mắc bệnh thấp, nhưng các mùa khác cũng có thể phát bệnh. Thấp tà gây bệnh có phân biệt ngoại thấp và nội thấp. Ngoại thấp phần nhiều do khí hậu ẩm thấp, lội nước dầm mưa, cùng với môi trường cư trú ẩm thấp gây nên. Nội thấp là do Tỳ mất kiện vận, thủy thấp nội đình mà sinh ra. Ngoại thấp và nội thấp thường ảnh hưởng lẫn nhau, làm nhân quả cho nhau. Tính chất và đặc điểm gây bệnh của thấp tà như sau:</p>
+<p>1) Thấp tính trọng trọc. Trọng, tức là nặng nề hoặc trầm trọng. Chỉ thấp tà gây bệnh, thường có cảm giác nặng nề như đầu thân nặng nề, tứ chi mỏi nhừ. Trọc, tức là uế trọc. Chỉ thấp tà gây bệnh, phần nhiều biểu hiện ở phân tiết và bài tiết uế trọc không sạch, như nhiều gỉ mặt và dử mắt, phân lỏng hoặc phân nhầy lẫn mủ và máu, nước tiểu đục, khí hư ra nhiều và mủ đục.</p>
+<p>2) Thấp tính niêm trệ. Niêm tức là dính nhớt, trệ tức là đình trệ. Tính niêm trệ của thấp chủ yếu biểu hiện ở hai phương diện: một là, triệu chứng của bệnh thấp phần nhiều dính nhớt khó chịu, như rêu lưỡi dính nhớt, phân nhầy dính khó đi, tiểu tiện sáp trệ không thông, v.v.; hai là, thấp tà gây bệnh có bệnh trình dài, dây dưa khó khỏi, như thấp tý, thấp chẩn, thấp ôn bệnh, v.v.</p>
+<p>3) Thấp tính xu hướng hạ. Thấp tà gây bệnh, triệu chứng phần nhiều thấy ở phần dưới của cơ thể, như đới hạ, lâm trọc, tiết lỵ, v.v.</p>
+<p>4) Thấp là âm tà, dễ trở ngại khí cơ, tổn thương dương khí. Thấp tính trọng trọc, tính giống như nước, nên thuộc âm tà. Thấp tà gây bệnh, dễ nhất là làm trở ngại khí cơ, khiến sự thăng giáng mất thường. Như thấp trở ngại hung cách, khí cơ bất thông, thì ngực đầy tức; thấp khốn Tỳ Vị, vận hóa thất chức, thăng giáng thất thường, thì nạp ngốc, quản muộn, ẩu ác, tiện lỏng. Vì thấp là âm tà, dễ làm tổn thương dương khí của người, thấp tà khốn Tỳ, Tỳ dương bất chấn, vận hóa vô quyền, thủy thấp đình tụ, do đó xuất hiện tiết tả, thủy thũng, tiểu tiện bất lợi, v.v.</p>
+<p>5. Táo — Táo là chủ khí của mùa thu. Mùa thu là mùa khô ráo, thiếu nước. Bệnh táo dễ phát sinh nhất vào mùa này. Táo tà có thể chia thành ngoại táo và nội táo. Bệnh do ngoại táo phần nhiều do cảm thụ táo tà từ môi trường. Ngoại táo lại chia thành ôn táo và lương táo. Ôn táo phần nhiều thấy vào đầu thu, do dư nhiệt của cuối hè kết hợp với táo tà tạo thành. Lương táo phần nhiều thấy vào cuối thu, do hàn tà của mùa đông đang tới kết hợp với táo tà tạo thành. Khi ngoại táo xâm phạm cơ thể con người, nó thường xâm nhập từ miệng mũi và làm tổn hại vệ khí cùng Phế, hình thành biểu chứng. Nội táo phần nhiều do bệnh lâu ngày làm tinh huyết khô kiệt, bệnh nhiệt làm hao tân dịch, điều trị không đúng và mất máu gây nên. Tính chất và đặc điểm gây bệnh của táo tà như sau:</p>
+<p>1) Táo tà tính khô, dễ làm tổn thương tân dịch. Khi táo tà gây bệnh, phần nhiều xuất hiện các hình thức khô ráo khác nhau, như khô miệng khô mũi, khô họng, khát nước, da khô, thậm chí nứt nẻ, tiểu tiện ít và táo bón.</p>
+<p>2) Táo tà dễ làm tổn thương Phế. Phế là tạng non nớt, ưa nhuận ghét táo, dễ bị táo tà xâm phạm. Phế có quan hệ với bì mao của cơ biểu và có khiếu riêng ở mũi, nên táo tà thường xâm nhập qua miệng mũi và dễ nhất là làm tổn thương Phế, gây các triệu chứng như khô mũi khô họng, ho khan ít đờm, khó thở hoặc hen suyễn và đau ngực.</p>
+<p>6. Hỏa. Hỏa tuy cùng tính chất với ôn và nhiệt, nhưng có khác biệt. Ôn và nhiệt đều chỉ tà bệnh mà nói, hai giả chỉ khác nhau về mức độ, không có khác biệt về bản chất, nên Đông y thường gọi chung là ôn nhiệt. Hỏa có hai nghĩa: một là chỉ chính khí của nhân thể, Hoàng Đế Nội Kinh gọi là "thiếu hỏa"; hai là chỉ tà bệnh, Hoàng Đế Nội Kinh gọi là "tráng hỏa".</p>
+<p>Hỏa tà cũng có phân biệt trong ngoài. Thuộc ngoại cảm, phần nhiều do trực tiếp cảm thụ ôn nhiệt tà khí xâm nhập; thuộc nội sinh, thường do tạng phủ dương khí quá thịnh mà thành, tức như Chu Đan Khê nói: "Khí hữu dư tiện thị hỏa". Ngoài ra, cảm thụ phong, hàn, thấp, táo v.v. các loại ngoại tà, hoặc kích thích tinh thần, trong điều kiện nhất định đều có thể hóa hỏa. Tính chất và đặc điểm gây bệnh của hỏa tà như sau:</p>
+<p>1) Hỏa tính chước, tức thiêu đốt, chước tức bỏng cháy. Hỏa tà gây bệnh, thường thấy các chứng cao nhiệt, mặt đỏ mắt đỏ, ghét nhiệt thích mát, táo bón tiểu đỏ, lưỡi đỏ rêu vàng v.v.</p>
+<p>2) Hỏa tính viêm thượng. Hỏa tà gây bệnh, chứng hậu phần nhiều biểu hiện ở phần trên của nhân thể, như đầu mặt. Nếu Tâm hỏa thượng viêm, thì thấy đầu lưỡi đỏ; Vị hỏa xí thịnh, thấy lợi răng sưng đau; Can hỏa thượng viêm, thường thấy mắt đỏ sưng đau.</p>
+<p>3) Hỏa dễ tổn thương tân dịch hao khí. Hỏa tà làm họa, dễ bức tân dịch ngoại tiết, tiêu chước tân dịch, hao tổn âm tân, nên thường kiêm các chứng tân dịch tổn cùng các chứng tân dịch tổn như khát nước thích uống, họng khô miệng ráo, tiểu tiện ngắn đỏ, đại tiện táo kết. Hỏa tà dễ tổn thương chính khí của nhân thể nhất, nên hỏa tà gây bệnh, còn có thể kiêm thấy thiếu khí lười nói, tứ chi mỏi mệt v.v. chứng khí hư.</p>
+<p>4) Hỏa dễ sinh phong động huyết. Hỏa tà xâm nhập nhân thể, thường chước thương Can âm, khiến cân mạch mất nuôi dưỡng, mà dẫn đến Can phong nội động, xuất hiện cao nhiệt, co giật, mắt trợn ngược, cổ gáy cứng đờ, góc cung phản trương v.v. Hỏa tà làm họa, có thể gia tốc huyết hành, dễ chước thương mạch lạc, thậm chí bức huyết vọng hành, xuất hiện khái huyết, tỵ huyết, tiện huyết, niệu huyết, ban chẩn, băng lậu v.v. các chứng xuất huyết.</p>
+<p>5) Hỏa dễ gây ung nhọt. Hỏa tà xâm nhập huyết phận, có thể tụ ở cục bộ, hủ nhục bại huyết, phát thành ung thũng sang nhọt, biểu hiện cục bộ hồng sưng nhiệt thống, thậm chí hóa mủ lở loét.</p>
+<p>6) Hỏa dễ nhiễu Tâm thần. Tâm chủ huyết mạch mà tàng thần, hỏa tà làm họa, dễ nhiễu loạn Tâm thần nhất. Nhẹ thì tâm phiền, thất miên; nặng thì cuồng táo vọng động, thần hôn siểm ngữ v.v.</p>
+<h3>Tiết thứ hai</h3>
+<h3>Lệ khí</h3>
+<p>Lệ khí là một loại tà bệnh có tính truyền nhiễm rất mạnh. Trong văn hiến Đông y, nó còn được gọi là "ôn dịch", "dịch độc", "lệ khí", "dị khí", "quái lệ chi khí" v.v.</p>
+<p>Lệ khí là một loại chất gây bệnh vi ti (vi sinh vật gây bệnh) mà giác quan của con người không thể trực tiếp quan sát được, và phần nhiều xâm nhập nhân thể qua miệng mũi. Sự phát hiện ra lệ khí là một bước tiến trọng đại trong nguyên nhân học Đông y. Lệ khí gây bệnh có đặc điểm phát bệnh cấp bách, bệnh tình khá nặng, chứng trạng tương tự, tính truyền nhiễm mạnh, dễ lưu hành, như dịch lỵ, bạch hầu, lạn hầu đan sa, thiên hoa, thổ tả, thử dịch v.v.</p>
+<p>Những thứ này thực tế đã bao gồm nhiều bệnh truyền nhiễm trong y học hiện đại.</p>
+<p>Lệ khí gây họa, phần nhiều liên quan đến khí hậu phản thường, như hạn hán, lụt lội, khốc nhiệt v.v., không khí, nguồn nước hoặc thức ăn bị ô nhiễm, cùng việc không kịp thời làm tốt công tác dự phòng cách ly.</p>
+<p>Sau khi mắc bệnh dịch thường có tính miễn dịch, có trường hợp đạt được miễn dịch suốt đời, không tái mắc. Đông y căn cứ vào đặc điểm này, sớm vào khoảng thế kỷ thứ 10 công nguyên đã sáng tạo ra "nhân đậu tiếp chủng thuật", trở thành người tiên phong của miễn dịch nhân tạo trên thế giới. Hiện nay, các cơ quan y tế Trung Quốc các cấp rộng rãi triển khai miễn dịch nhân tạo để phòng bệnh, khiến tỷ lệ phát bệnh truyền nhiễm giảm rõ rệt. Trong đó, thiên hoa, thổ tả, thử dịch v.v. các bệnh truyền nhiễm kịch liệt đã sớm tuyệt tích.</p>
+<p>Thực tiễn lâm sàng chứng minh, Đông dược đối với cúm, lỵ trực khuẩn, viêm gan truyền nhiễm v.v. nhiều loại bệnh truyền nhiễm có hiệu quả điều trị rất tốt, đã nhận được sự coi trọng rộng rãi.</p>
+<h3>Tiết thứ ba</h3>
+<h3>Ký sinh trùng</h3>
+<p>Đông y từ lâu đã nhận thức được rằng ký sinh trùng có thể gây bệnh, như y gia thời Đông Hán là Trương Trọng Cảnh trong Thương hàn luận đã luận thuật về chứng trị "quyết" (giun chui ống mật). Đến thời Tùy, trong Chư bệnh nguyên hậu luận của Sào Nguyên Phương, đối với bệnh giun kim, bệnh sán đã có ghi chép khá tỉ mỉ, cho rằng nguyên nhân phát bệnh là ẩm thực không sạch, còn bệnh sán là do ăn thịt bò chưa chín mà ra. Đông y gọi bệnh sán máng là "thủy độc", cho rằng do uống nước ao bị ô nhiễm mà ra.</p>
+<p>Đặc trưng lâm sàng của các loại bệnh ký sinh trùng khác nhau. Giun đũa ký sinh ở trường đạo, đau bụng từng cơn, giun chui lên ống mật, có thể gây quyết. Bệnh giun móc thường biểu hiện mặt vàng gầy còm, thích ăn vật lạ.</p>
+<p>Bệnh nhân mắc bệnh giun kim thường chủ tố hậu môn, hội âm ngứa, và có thể tìm thấy trực tiếp ở những bộ vị này giun kim nhỏ sợi màu trắng. Chứng trạng bệnh sán tương đối nhẹ, thường vì trong phân phát hiện đốt sán trưởng thành dạng dải màu trắng mà đi khám. Bệnh sán máng do Can Tỳ sưng to, huyết hành bất thông mà khiến thủy dịch đình tụ ở bụng, hình thành "cổ trướng". Đông dược điều trị bệnh ký sinh trùng an toàn và đáng tin cậy.</p>
+<h3>Tiết thứ tư</h3>
+<h3>Nội thương do thất tình</h3>
+<p>Thất tình, tức bảy loại biến hóa tình chí là hỷ, nộ, ưu, tư, bi, khủng, kinh, là những phản ánh khác nhau của nhân thể đối với sự vật khách quan. Trong tình huống bình thường, thuộc phạm vi hoạt động tinh thần bình thường, sẽ không khiến người ta phát bệnh. Nhưng khi tình chí kích thích đột ngột, mãnh liệt hoặc lâu dài, bền bỉ vượt quá năng lực thích ứng và mức độ chịu đựng của nhân thể, sẽ khiến tạng phủ công năng của người ta rối loạn, khí cơ mất điều hòa mà phát bệnh. Lúc này, tình chí kích thích trở thành nhân tố gây bệnh, gọi là thất tình nội thương.</p>
+<h3>1. Quan hệ giữa thất tình và nội tạng</h3>
+<p>Đông y cho rằng, hoạt động tinh thần của con người có quan hệ mật thiết với nội tạng, như Tố vấn · Âm dương ứng tượng đại luận nói: "Nhân hữu ngũ tạng hóa ngũ khí, dĩ sinh hỷ nộ bi ưu khủng". Và còn cho rằng, một nội tạng nào đó thường có quan hệ với một hoạt động tình chí nào đó, tức Tâm tại chí vi hỷ, Can tại chí vi nộ, Tỳ tại chí vi tư, Phế tại chí vi ưu, Thận tại chí vi khủng. Tình chí kích thích từ bên ngoài, chỉ có tác dụng lên nội tạng tương ứng, mới có thể biểu hiện thành phản ánh tình chí đặc định.</p>
+<p>2. Đặc điểm gây bệnh của thất tình. Thất tình gây bệnh khác với lục dâm. Lục dâm xâm nhập nhân thể, phần nhiều từ bì phu và miệng mũi mà vào, lúc phát bệnh ban đầu phần nhiều thấy biểu chứng. Mà thất tình gây bệnh, thì là trực tiếp ảnh hưởng nội tạng tương ứng mà phát bệnh. Như Tố vấn · Âm dương ứng tượng đại luận nói: "Nộ thương Can", "Hỷ thương Tâm", "Tư thương Tỳ", "Ưu thương Phế", "Khủng thương Thận". Do Tâm chủ thần chí, là đại chủ của ngũ tạng lục phủ, nên Linh khu · Khẩu vấn nói: "Bi ai sầu ưu tắc tâm động, tâm động tắc ngũ tạng lục phủ giai dao".</p>
+<p>Thất tình tổn thương nội tạng, chủ yếu là ảnh hưởng khí cơ của tạng phủ. Như Tố vấn · Cử thống luận nói: "Nộ tắc khí thượng, hỷ tắc khí hoãn, bi tắc khí tiêu, khủng tắc khí hạ, kinh tắc khí loạn, tư tắc khí kết."</p>
+<p>Tình chí kích thích có thể dẫn khởi tạng phủ khí cơ mất điều hòa, mà tạng phủ khí cơ mất điều hòa lại có thể xuất hiện các biến hóa tình chí khác nhau, như Linh khu · Bản thần nói: "Can khí hư tắc khủng, thực tắc nộ", "Tâm khí thực tắc tiếu bất hưu". Thất tình đã có thể gây bệnh, lại có thể làm bệnh tình nặng thêm. Trong quá trình của nhiều bệnh, bệnh tình thường vì ba động cảm xúc khá mãnh liệt mà chuyển xấu. Nên Đông y rất coi trọng việc an ủi và điều dưỡng tinh thần cho bệnh nhân, để xúc tiến bệnh hướng về phương hướng tốt.</p>
+<h3>Tiết thứ năm</h3>
+<h3>Ăn uống, lao dật</h3>
+<p>Ẩm thực, lao động và nghỉ ngơi, là điều kiện cơ bản để loài người sinh tồn và duy trì sức khỏe, nhưng nếu ăn uống không điều độ, hoặc lao dật thất thường, sẽ ảnh hưởng công năng sinh lý của tạng phủ, giảm thấp năng lực kháng bệnh của cơ thể, trở thành nhân tố gây bệnh.</p>
+<p>1. Ăn uống không điều độ. Bao gồm ba phương diện: cơ bão thất thường, ăn uống không sạch và ăn uống thiên thị.</p>
+<p>1) Cơ bão thất thường. Ăn uống lấy thích lượng làm thích nghi, quá cơ, quá bão đều có thể gây bệnh. Quá cơ, tức thủ thực bất túc, thì khí huyết sinh hóa chi nguyên bất túc, cuối cùng khí huyết suy thiểu mà thành bệnh. Như Linh khu · Ngũ vị nói: "Cốc bất nhập, bán nhật tắc khí suy, nhất nhật tắc khí thiểu." Đồng thời, khí huyết suy thiểu thì năng lực kháng bệnh giảm yếu, dễ bị ngoại tà xâm phạm. Quá bão, tức ăn uống quá lượng, vượt quá năng lực tiêu hóa bình thường, cũng sẽ vì thực tích trung tiêu mà phát bệnh, biểu hiện viện phúc trướng mãn, ái hủ thôn toan, yếm thực ẩu thổ, tả hạ xú uế v.v., nên Tố vấn · Tý luận nói: "Ẩm thực tự bội, tràng vị nãi thương." Tiểu nhi do Tỳ Vị còn yếu, không biết cơ bão, càng dễ mắc bệnh.</p>
+<p>2) Ăn uống không sạch. Ăn uống không sạch có thể dẫn khởi nhiều loại bệnh đường tiêu hóa (biểu hiện ẩu thổ, tiết tả, phúc thống, tiện nùng huyết v.v.) hoặc các loại bệnh ký sinh trùng. Nếu ngộ thực thức ăn hủ bại biến chất hoặc có độc, có thể dẫn khởi trúng độc thức ăn, nhẹ thì thổ tả phúc thống, nặng thì thương tân vong dương, xuất hiện nhãn oa hạ hãm, tứ chi quyết lãnh v.v.</p>
+<p>3) Ăn uống thiên thị. Người ta lấy ngũ cốc làm dưỡng, ăn uống nên điều phối thích đáng, mới có thể thu được các loại dinh dưỡng tất yếu. Bất kỳ thiên thị nào, đều có thể tạo thành âm dương thất điều hoặc dinh dưỡng khuyết thiếu mà gây bệnh. Như thiên thực sinh lãnh, dễ thương trung dương; thiên thực táo nhiệt, dễ sinh Vị nhiệt; cao lương hậu vị, dễ phát ung đinh. Thiên thị ngũ vị, cũng có thể gây bệnh. Như Tố vấn · Sinh khí thông thiên luận nói: "Vị quá ư toan, Can khí dĩ tân, Tỳ khí nãi tuyệt; vị quá ư hàm, đại cốt khí lao, đoản cơ, Tâm khí ức; vị quá ư cam, Tâm khí suyễn mãn, sắc hắc, Thận khí bất hành; vị quá ư khổ, Tỳ khí bất túc, Vị khí nãi hậu; vị quá ư tân, cân mạch thư trì, tinh thần nãi ương." Ngoài ra, bệnh cước khí, bệnh dạ manh, bệnh anh lựu v.v., cũng là kết quả của thiên thị ngũ vị, dinh dưỡng bất toàn.</p>
+<p>2. Lao dật thất thường. Lao dật thất thường bao gồm hai phương diện quá lao và quá dật.</p>
+<p>1) Quá lao. Bao gồm lao lực quá độ, lao thần quá độ và phòng lao quá độ.</p>
+<p>(1) Lao lực quá độ: là chỉ thể lực lao động quá độ. Tố vấn · Cử thống luận nói: "Lao tắc khí háo." Nhẹ thì bì quyện vô lực, thiếu khí lười nói, tinh thần bì bại; nặng thì cân cốt cơ nhục tổn thương, xuất hiện yêu thống, tứ chi quan tiết cơ nhục đông thống v.v.</p>
+<p>(2) Lao thần quá độ: là chỉ não lực lao động quá độ. Như lao thần quá độ, hao thương Tâm huyết, tổn thương Tỳ khí, có thể xuất hiện tâm quý, kiện vong, thất miên, đa mộng, nạp ngốc, phúc trướng và tiện đường v.v.</p>
+<p>(3) Phòng lao quá độ: là chỉ sinh hoạt tình dục quá độ. Đời sống tình dục có tiết chế, không những không tổn thương thân thể, trái lại có ích cho giấc ngủ và nghỉ ngơi. Nhưng nếu phòng sự không tiết chế, có thể hao thương Thận tinh, xuất hiện lưng gối mỏi nhuyễn, chóng mặt ù tai, tinh thần uể oải; nam giới dương nuy, hoạt tinh hoặc không xuất tinh, phụ nữ kinh nguyệt không đều, đới hạ v.v.</p>
+<p>2) Quá dật. Quá dật là chỉ quá độ an dật. Không lao động, không rèn luyện, có thể khiến khí huyết bất thông, cân mạch cơ nhục thư nhuyễn thúy nhược, và Tỳ Vị trệ trở, biểu hiện tinh thần bất chấn, ăn uống kém ngon, mỏi mệt vô lực, động thì khí đoản, tâm quý hoặc phì bàng. Cũng khiến năng lực kháng bệnh của cơ thể giảm thấp, khiến cơ thể dễ bị ngoại tà xâm tập.</p>
+<h3>Tiết thứ sáu</h3>
+<h3>Ngoại thương</h3>
+<p>Ngoại thương bao gồm vết thương do súng đạn, vết thương do đâm chém, tổn thương do ngã đập (bao gồm thương do đao kiếm, té ngã, đả thương, đâm và trầy xước và vận động tổn thương), tổn thương do mang vác nặng quá sức, nữu thương, bắt thương và lệch khớp, bỏng lửa bỏng nước, cùng côn trùng thú vật cắn thương. Nhẹ thì có thể gây rách da, cơ nhục và các tổ chức, chảy máu, sưng đau, hoặc gãy xương, trật khớp; nặng thì có thể tổn thương nội tạng, huyết mạch, gây xuất huyết nội tạng, ứ huyết, rối loạn chức năng, xuất huyết, vong âm vong dương, thậm chí tử vong.</p>
+<h3>Tiết thứ bảy</h3>
+<h3>Đàm ẩm, ứ huyết</h3>
+<p>Đàm ẩm và ứ huyết đều là sản vật bệnh lý được hình thành trong quá trình bệnh tật của cơ thể. Khi chúng hình thành, lại có thể trực tiếp hoặc gián tiếp tác động lên một tổ chức, khí quan nào đó của cơ thể, gây ra những biến đổi bệnh lý mới, hình thành các chứng hậu khác nhau. Nên chúng cũng thuộc một trong những nhân tố gây bệnh.</p>
+<h3>1. Đàm ẩm đình trệ</h3>
+<p>Đàm ẩm đình trệ được đặc trưng bởi sự tích tụ thấp trọc như một sản vật bệnh lý phát sinh từ rối loạn chuyển hóa thủy dịch. Đông y phân loại loại thấp đục đặc hơn là đàm, loại loãng trong hơn là ẩm. Đàm ẩm đình trệ lại được phân biệt thành hữu hình và vô hình. Đàm ẩm hữu hình là loại đàm trọc và dịch ẩm thực chất có thể nhìn thấy, sờ thấy và nghe thấy tiếng; còn đàm ẩm vô hình chỉ các chứng bệnh khác nhau do đàm ẩm gây ra, như chóng mặt, tức ngực, cuồng uất, hạch dưới da và tràng nhạc, đặc trưng bởi rêu lưỡi nhớt và mạch hoạt. Gọi là "đàm vô hình" vì loại "đàm" này chỉ biểu hiện ra triệu chứng mà không có hình thể cụ thể, và có thể khỏi bằng các phương pháp hóa đàm.</p>
+<p>Đàm ẩm đình trệ phần nhiều do cảm phải lục dâm, hoặc ăn uống không điều độ, hoặc thất tình nội thương. Những nhân tố gây bệnh này khiến khí của Phế, Tỳ, Thận và Tam tiêu bị rối loạn công năng, làm chuyển hóa thủy dịch trở ngại, dẫn đến tích tụ dịch trong cơ thể. Một khi đàm ẩm hình thành, nó có thể theo khí mà lưu hành, vào trong tạng phủ, ra ngoài da thịt, gân cốt. Thực tế nó có thể đến khắp mọi nơi và gây ra nhiều bệnh.</p>
+<p>Ví dụ, đàm trệ ở Phế có thể gây ho suyễn và khạc đàm; đàm trở ở Tâm có thể gây tâm quý và tức ngực; đàm xâm nhập vào Tâm gây tinh thần hôn mê có thể dẫn đến hôn mê và si ngốc; đàm tích ở trung tiêu có thể gây đầy thượng vị, nôn mửa, buồn nôn và chóng mặt; đàm trệ ở kinh lạc có thể dẫn đến tê mỏi tứ chi, co duỗi khó khăn và duỗi ra, thậm chí bán thân bất toại; đàm trệ ở gân... Dịch tà biểu hiện khác nhau tùy theo vị trí đình trệ khác nhau trong cơ thể. Như sách Kim Quỹ Yếu Lược nói: "Người vốn khỏe mạnh nay gầy ốm, nước chảy trong ruột phát ra tiếng róc rách, gọi là đàm ẩm (nghĩa hẹp); sau khi uống nước chảy xuống dưới sườn, ho và nằm đau, gọi là huyền ẩm; nước uống lưu hành về tứ chi, đáng ra phải ra mồ hôi mà không ra mồ hôi, thân thể đau nhức, gọi là dật ẩm; ho nghịch phải dựa để thở, khí đoản không nằm được, hình như phù thũng, gọi là chi ẩm."</p>
+<p>2. Ứ huyết. Ứ huyết là trạng thái bệnh lý phát sinh do huyết dịch chảy ngược hoặc bị trở ngại trong cơ thể, hoặc do huyết hành ứ trệ ở cục bộ, cũng như do huyết ly kinh không ở trong mạch máu bình thường, đọng lại trong cơ thể mà không tan. Một khi ứ huyết hình thành, nó lại có thể ảnh hưởng thêm đến sự tuần hoàn của huyết dịch, dẫn đến những biến đổi bệnh lý mới, gây ra nhiều loại bệnh và chứng. Nên nó cũng là một trong những nhân tố gây bệnh.</p>
+<p>Ứ huyết được hình thành theo hai cách. Một là do sự tuần hoàn huyết dịch bị trở ngại bởi khí hư, khí trệ, huyết hàn và huyết nhiệt... Ví dụ, khí hư khiến vận hành huyết yếu ớt, khí trệ khiến huyết hành không thông, huyết hàn khiến huyết dịch ngưng kết, huyết nhiệt khiến huyết dịch niêm trệ; tất cả đều có thể làm huyết hành không thông mà hình thành ứ huyết. Hai là do ngoại thương hoặc các nguyên nhân khác gây huyết ly kinh, không tan được, đình trệ trong cơ thể mà hình thành ứ huyết.</p>
+<p>Ứ huyết có những biểu hiện lâm sàng khác nhau tùy theo vị trí đình trệ khác nhau trong cơ thể và những nguyên nhân hình thành khác nhau. Ví dụ, ứ huyết ở tâm mạch có thể dẫn đến tâm quý, tức ngực và đau trước tim; ứ ở Phế có thể dẫn đến đau ngực, ho suyễn và khái huyết; ứ ở Vị có thể dẫn đến đau nhói ở dạ dày và đại tiện phân đen; ứ ở Can có thể dẫn đến đau sườn và gan to; ứ huyết công Tâm có thể dẫn đến phát cuồng; ứ ở bào cung có thể dẫn đến đau hạ phúc, thống kinh, bế kinh, kinh nguyệt tím đen có cục, hoặc băng lậu; ứ huyết trệ ở tận cùng huyết mạch tứ chi có thể dẫn đến thư đậu; ứ huyết trệ ở cục bộ có thể gây sưng đau cục bộ và tím tái.</p>
+<p>Tuy bệnh do ứ huyết gây ra nhiều và đa dạng, nhưng biểu hiện lâm sàng của chúng có thể tóm lại như sau: đau nhói, tím tái, khối u, xuất huyết (huyết sắc tím sẫm kèm huyết cục), sắc mặt sạm đen, da thô ráp khô, chất lưỡi tím sẫm hoặc có điểm ứ, ban ứ, mạch tế sáp hoặc mạch kết đại.</p>
+</section>
+</main>
+</div>
+
+<script>
+window.addEventListener('scroll', () => {
+  const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  const scrolled = (window.scrollY / docHeight) * 100;
+  document.getElementById('progress-bar').style.width = scrolled + '%';
+});
+
+const themeToggle = document.getElementById('theme-toggle');
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const target = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', target);
+  themeToggle.innerHTML = target === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+});
+
+let fontSize = 17;
+document.getElementById('font-up').addEventListener('click', () => {
+  if (fontSize < 24) {
+    fontSize += 1;
+    document.getElementById('book-content').style.fontSize = fontSize + 'px';
+  }
+});
+document.getElementById('font-down').addEventListener('click', () => {
+  if (fontSize > 14) {
+    fontSize -= 1;
+    document.getElementById('book-content').style.fontSize = fontSize + 'px';
+  }
+});
+
+const sections = document.querySelectorAll('section[id], h3[id]');
+const tocLinks = document.querySelectorAll('.toc-nav a');
+window.addEventListener('scroll', () => {
+  let currentId = '';
+  sections.forEach(sec => {
+    const top = sec.offsetTop - 120;
+    if (window.scrollY >= top) {
+      currentId = sec.getAttribute('id');
+    }
+  });
+  tocLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + currentId) {
+      link.classList.add('active');
+    }
+  });
+});
+</script>
+
+</body>
+</html>
