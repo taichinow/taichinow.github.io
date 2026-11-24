@@ -78,6 +78,12 @@ jobs:
         with:
           path: '_site'
 
+      # upload-pages-artifact finishes before the artifact metadata API
+      # is consistent; deploy-pages@v4 has repeatedly found 0 artifacts
+      # when it queries immediately after a ~737 MB upload.
+      - name: Wait for artifact metadata consistency
+        run: sleep 60
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
