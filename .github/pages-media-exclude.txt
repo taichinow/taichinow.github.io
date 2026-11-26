@@ -579,3 +579,6 @@ scripts/__pycache__/build_batch6.cpython-314.pyc
 scripts/__pycache__/build_topics.cpython-311.pyc
 scripts/__pycache__/build_topics.cpython-314.pyc
 scripts/__pycache__/enrich_topics_data.cpython-311.pyc
+facebook/media/videos/1458680312215069.mp4
+facebook/media/videos/853722481115215.mp4
+facebook/media/videos/1713940806470767.mp4
